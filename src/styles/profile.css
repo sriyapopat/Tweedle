@@ -1,0 +1,18 @@
+.profile-info {
+  background-color: white;
+  padding: 1.5rem;
+  margin: 2rem auto;
+  border-radius: 10px;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.profile-info h2 {
+  margin-bottom: 0.5rem;
+  color: #1da1f2;
+}
+
+.profile-info p {
+  margin: 0.4rem 0;
+}
