@@ -1,0 +1,22 @@
+.tweet-form {
+  width: 100%;
+  max-width: 1000px;
+  background-color: rgb(201, 196, 196);
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+}
+.tweet-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.tweet-textarea {
+  width: 100%;
+  min-height: 150px;
+  resize: none;
+  background-color: #eeebeb;
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+}

@@ -1,7 +1,11 @@
 import React from 'react';
 
-const Loader = () => {
-  return <div className="loader">Loading...</div>;
+const Loader = ({ size = 'medium' }) => {
+  return (
+    <div className={`loader-container ${size}`}>
+      <div className="loader"></div>
+    </div>
+  );
 };
 
 export default Loader;

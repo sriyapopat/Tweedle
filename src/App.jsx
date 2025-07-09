@@ -1,23 +1,23 @@
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { store } from './store';
+import Navbar from './components/Navbar';
 import AppRoutes from './routes/AppRoutes';
-import store from './store';
 
-import './styles/globals.css';
-import './styles/tweetCard.css';
-import './styles/profile.css';
-import './styles/resposive.css';
-import './styles/navbar.css';
-
-const App = () => {
+function App() {
   return (
     <Provider store={store}>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <Router>
+        <div className="App">
+          <Navbar />
+          <main className="main-content">
+            <AppRoutes />
+          </main>
+        </div>
+      </Router>
     </Provider>
   );
-};
+}
 
 export default App;

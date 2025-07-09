@@ -1,35 +1,72 @@
-import { useLocation } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import Home from "../pages/Home";
-import Login from "../pages/Login";
-import Register from "../pages/Register";
-import Profile from "../pages/Profile";
-import Tweet from "../pages/Tweet";
-import UserProfile from "../pages/UserProfile";
-import PostPage from "../pages/PostPage";
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import Home from '../pages/Home';
+import Login from '../pages/Login';
+import Register from '../pages/Register';
+import Profile from '../pages/Profile';
+import UserProfile from '../pages/UserProfile';
+import Tweet from '../pages/Tweet';
+import PostPage from '../pages/PostPage';
+
+const ProtectedRoute = ({ children }) => {
+  const { user } = useSelector((state) => state.auth);
+  return user ? children : <Navigate to="/login" />;
+};
+
+const PublicRoute = ({ children }) => {
+  const { user } = useSelector((state) => state.auth);
+  return !user ? children : <Navigate to="/" />;
+};
 
 const AppRoutes = () => {
-  const location = useLocation();
-  const hideNavbarOn = ['/login', '/register'];
-  const hideNavbar = hideNavbarOn.includes(location.pathname);
-
   return (
-    <>
-      {!hideNavbar && <Navbar />}
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/" element={<Home />} />
-        <Route path="/tweet" element={<Tweet />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/user/:username" element={<UserProfile />} />
-        <Route path="/post/:id" element={<PostPage />} />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </>
+    <Routes>
+      <Route path="/" element={
+        <ProtectedRoute>
+          <Home />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/login" element={
+        <PublicRoute>
+          <Login />
+        </PublicRoute>
+      } />
+      
+      <Route path="/register" element={
+        <PublicRoute>
+          <Register />
+        </PublicRoute>
+      } />
+      
+      <Route path="/profile" element={
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/user/:username" element={
+        <ProtectedRoute>
+          <UserProfile />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/post/:id" element={
+        <ProtectedRoute>
+          <Tweet />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/post" element={
+        <ProtectedRoute>
+          <PostPage />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
   );
 };
 
-export default AppRoutes; // ✅ make it default
+export default AppRoutes;

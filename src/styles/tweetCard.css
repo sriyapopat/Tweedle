@@ -1,10 +1,12 @@
 .tweet-card {
-  background: #fff;
+  background: #ffffff;
   border-radius: 10px;
   padding: 1rem;
   margin: 1rem 0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
+    
+
 
 .username {
   font-weight: bold;
@@ -27,6 +29,6 @@
 .comments-link {
   display: block;
   margin-top: 0.5rem;
-  color: #555;
+  color: #ebe5e5;
   text-decoration: underline;
 }

@@ -4,7 +4,7 @@ import tweetReducer from './features/tweet/tweetSlice';
 import commentReducer from './features/comment/commentSlice';
 import userReducer from './features/user/userSlice';
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
     auth: authReducer,
     tweets: tweetReducer,
