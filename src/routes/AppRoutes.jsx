@@ -9,6 +9,7 @@ import UserProfile from '../pages/UserProfile';
 import Tweet from '../pages/Tweet';
 import PostPage from '../pages/PostPage';
 
+
 const ProtectedRoute = ({ children }) => {
   const { user } = useSelector((state) => state.auth);
   return user ? children : <Navigate to="/login" />;
@@ -28,6 +29,7 @@ const AppRoutes = () => {
         </ProtectedRoute>
       } />
       
+
       <Route path="/login" element={
         <PublicRoute>
           <Login />

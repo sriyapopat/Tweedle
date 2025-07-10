@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTweets } from '../features/tweet/tweetSlice';
 import TweetCard from '../components/TweetCard';
-import TweetForm from '../components/TweetForm';
+//import TweetForm from '../components/TweetForm';
 import Loader from '../components/Loader';
 
 const Home = () => {
@@ -13,9 +13,9 @@ const Home = () => {
     dispatch(fetchTweets());
   }, [dispatch]);
 
-  const handleTweetSuccess = () => {
+  //const handleTweetSuccess = () => {
     // Tweet was posted successfully, the state is already updated
-  };
+  //};
 
   return (
     <div className="home-page">
@@ -23,7 +23,7 @@ const Home = () => {
         <div className="home-content">
           <h1>Home</h1>
           
-          <TweetForm onSuccess={handleTweetSuccess} />
+         
           
           {isLoading && tweets.length === 0 ? (
             <Loader size="large" />

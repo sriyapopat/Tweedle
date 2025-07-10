@@ -4,7 +4,7 @@ export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await new Promise((resolve) => {
+      const response = await new Promise((resolve, reject) => {
         setTimeout(() => {
           if (email === 'demo@tweedle.com' && password === 'demo123') {
             resolve({
@@ -17,15 +17,29 @@ export const loginUser = createAsyncThunk(
                   bio: 'Demo user for Tweedle',
                   joinedAt: '2024-01-01',
                 },
-                token: 'mock-jwt-token',
+                token: 'mock-jwt-token-demo',
+              },
+            });
+          } else if (email === 'demo1@tweedle.com' && password === 'demo1123') {
+            resolve({
+              data: {
+                user: {
+                  id: '2',
+                  username: 'demo1_user',
+                  email: 'demo1@tweedle.com',
+                  avatar: null,
+                  bio: 'Second demo user',
+                  joinedAt: '2020-09-08',
+                },
+                token: 'mock-jwt-token-demo1',
               },
             });
           } else {
-            throw new Error('Invalid credentials');
+            reject(new Error('Invalid credentials'));
           }
         }, 1000);
       });
-      
+
       localStorage.setItem('token', response.data.token);
       return response.data;
     } catch (error) {
@@ -55,7 +69,7 @@ export const registerUser = createAsyncThunk(
           });
         }, 1000);
       });
-      
+
       localStorage.setItem('token', response.data.token);
       return response.data;
     } catch (error) {
@@ -72,6 +86,19 @@ const authSlice = createSlice({
     isLoading: false,
     error: null,
   },
+  reducers: {
+  followUser: (state, action) => {
+    const userId = action.payload;
+    if (!state.user.following.includes(userId)) {
+      state.user.following.push(userId);
+    }
+  },
+  unfollowUser: (state, action) => {
+    const userId = action.payload;
+    state.user.following = state.user.following.filter(id => id !== userId);
+  },
+  // ... other reducers
+},
   reducers: {
     logout: (state) => {
       localStorage.removeItem('token');
@@ -113,5 +140,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, clearError } = authSlice.actions;
+export const { logout, clearError, followUser, unfollowUser } = authSlice.actions;
 export default authSlice.reducer;
+

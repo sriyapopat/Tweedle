@@ -57,7 +57,7 @@ button:hover {
 
 .logo-img {
   width:300px;
-  height: auto
+  height: auto;
   object-fit: contain;
 }
 

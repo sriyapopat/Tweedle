@@ -1,5 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+const savedTweets = JSON.parse(localStorage.getItem("tweets"));
+
+const initialState = {
+  tweets: savedTweets || [],
+  isLoading: false,
+  error: null,
+};
+
 const mockTweets = [
   {
     id: '1',
@@ -124,31 +132,40 @@ const tweetSlice = createSlice({
       })
       .addCase(fetchTweets.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.tweets = action.payload;
-      })
+        // Only set mock tweets if state is empty
+          if (state.tweets.length === 0) {
+          state.tweets = action.payload;
+          }})
       .addCase(fetchTweets.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
+       
       .addCase(postTweet.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(postTweet.fulfilled, (state, action) => {
         state.isLoading = false;
         state.tweets.unshift(action.payload);
+        localStorage.setItem("tweets", JSON.stringify(state.tweets));
       })
+
       .addCase(postTweet.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
+     
+    
       .addCase(toggleLike.fulfilled, (state, action) => {
-        const { tweetId, isLiked, likes } = action.payload;
-        const tweet = state.tweets.find(t => t.id === tweetId);
-        if (tweet) {
-          tweet.isLiked = isLiked;
-          tweet.likes = likes;
-        }
+         const { tweetId, isLiked, likes } = action.payload;
+          const tweet = state.tweets.find(t => t.id === tweetId);
+  if (tweet) {
+    tweet.isLiked = isLiked;
+    tweet.likes = likes;
+    localStorage.setItem("tweets", JSON.stringify(state.tweets));
+  }
       });
+
   },
 });
 

@@ -4,46 +4,35 @@ import { postTweet } from '../features/tweet/tweetSlice';
 import '../styles/tweetForm.css';
 
 const TweetForm = ({ onSuccess }) => {
-  const [content, setContent] = useState('');
   const dispatch = useDispatch();
   const { isLoading } = useSelector((state) => state.tweets);
+  const [content, setContent] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (content.trim()) {
-      const result = await dispatch(postTweet({ content: content.trim() }));
-      if (result.type === 'tweets/postTweet/fulfilled') {
-        setContent('');
-        if (onSuccess) onSuccess();
-      }
+    if (content.trim() === '') return;
+
+    const resultAction = await dispatch(postTweet({ content }));
+
+    if (postTweet.fulfilled.match(resultAction)) {
+      setContent('');
+      if (onSuccess) onSuccess();
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="tweet-form">
-      <div className="tweet-form-content">
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="What's happening?"
-          className="tweet-textarea"
-          rows={4}
-          maxLength={280}
-        />
-        <div className="tweet-form-footer">
-          <div className="character-count">
-            <span className={content.length > 250 ? 'warning' : ''}>
-              {content.length}/280
-            </span>
-          </div>
-          <button
-            type="submit"
-            className="btn-primary tweet-btn"
-            disabled={!content.trim() || isLoading}
-          >
-            {isLoading ? 'Posting...' : 'Post Tweet'}
-          </button>
-        </div>
+    <form className="tweet-form" onSubmit={handleSubmit}>
+      <textarea
+        className="tweet-textarea"
+        placeholder="What's happening?"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        rows={3}
+      />
+      <div className="tweet-actions">
+        <button type="submit" className="tweet-button" disabled={isLoading}>
+          {isLoading ? 'Posting...' : 'Tweet'}
+        </button>
       </div>
     </form>
   );
