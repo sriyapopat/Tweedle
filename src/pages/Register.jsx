@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { register } from '../features/auth/authSlice.js';
+import Loader from '../components/Loader.jsx';
 import { Twitter } from 'lucide-react';
-import { registerUser, clearError } from '../features/auth/authSlice';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -14,17 +15,23 @@ const Register = () => {
   
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user, isLoading, error } = useSelector((state) => state.auth);
+  const { loading, error } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    if (user) {
-      navigate('/');
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (formData.password !== formData.confirmPassword) {
+      alert('Passwords do not match');
+      return;
     }
-  }, [user, navigate]);
 
-  useEffect(() => {
-    dispatch(clearError());
-  }, [dispatch]);
+    const { confirmPassword, ...userData } = formData;
+    dispatch(register(userData)).then(() => {
+      if (!error) {
+        navigate('/login');
+      }
+    });
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -33,96 +40,103 @@ const Register = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
-      return;
-    }
-    
-    dispatch(registerUser({
-      username: formData.username,
-      email: formData.email,
-      password: formData.password,
-    }));
-  };
-
   return (
-    <div className="auth-page">
-      <div className="auth-container">
-        <div className="auth-header">
-          <Twitter size={48} />
-          <h1>Join Tweedle</h1>
-          <p>Create your account</p>
+    <div className="min-h-screen bg-black flex items-center justify-center px-4">
+      <div className="max-w-md w-full">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <Twitter className="h-12 w-12 text-blue-400" />
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-2">Join Tweedle</h1>
+          <p className="text-gray-400">Create your account today</p>
         </div>
-        
-        <form onSubmit={handleSubmit} className="auth-form">
-          {error && (
-            <div className="auth-error">
-              <p>{error}</p>
-            </div>
-          )}
-          
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
+              Username
+            </label>
             <input
               type="text"
               id="username"
               name="username"
               value={formData.username}
               onChange={handleChange}
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              placeholder="Choose a username"
               required
             />
           </div>
-          
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+              Email
+            </label>
             <input
               type="email"
               id="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              placeholder="Enter your email"
               required
             />
           </div>
-          
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+              Password
+            </label>
             <input
               type="password"
               id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              placeholder="Create a password"
               required
             />
           </div>
-          
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
+
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">
+              Confirm Password
+            </label>
             <input
               type="password"
               id="confirmPassword"
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              placeholder="Confirm your password"
               required
             />
           </div>
-          
-          <button type="submit" className="btn-primary auth-btn" disabled={isLoading}>
-            {isLoading ? 'Creating account...' : 'Sign Up'}
+
+          {error && (
+            <div className="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center"
+          >
+            {loading ? <Loader size="small" /> : 'Create Account'}
           </button>
         </form>
-        
-        <div className="auth-footer">
-          <p>
-            Already have an account?{' '}
-            <Link to="/login">Sign in</Link>
-          </p>
-        </div>
+
+        <p className="mt-6 text-center text-gray-400">
+          Already have an account?{' '}
+          <Link to="/login" className="text-blue-400 hover:text-blue-300 transition-colors">
+            Sign in
+          </Link>
+        </p>
       </div>
     </div>
   );

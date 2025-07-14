@@ -1,57 +1,83 @@
-import React from 'react';
-import { useNavigate, NavLink } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../features/auth/authSlice';
-import { Home, Edit, User, LogOut } from 'lucide-react';
-import logo from "../assets/logo.png";
-import '../styles/navbar.css';
-import SearchBar from './SearchBar'; 
+import { Home, User, PenTool, LogOut, Twitter } from 'lucide-react';
+import { logout } from '../features/auth/authSlice.js';
+import SearchBar from './SearchBar.jsx';
 
 const Navbar = () => {
-  const { user } = useSelector((state) => state.auth);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     dispatch(logout());
     navigate('/login');
   };
-   
+
+  const isLoginPage = location.pathname === '/login' || location.pathname === '/register';
+
+  if (isLoginPage) {
+    return (
+      <nav className="bg-black border-b border-gray-800 px-6 py-4">
+        <div className="max-w-6xl mx-auto">
+          <Link to="/" className="flex items-center space-x-2">
+            <Twitter className="h-8 w-8 text-blue-400" />
+            <span className="text-xl font-bold text-white">Tweedle</span>
+          </Link>
+        </div>
+      </nav>
+    );
+  }
+
+  if (!isAuthenticated) return null;
 
   return (
-    <nav className="navbar">
-      <div className="navbar-left">
-        <NavLink to="/" className="navbar-logo">
-          <img src={logo} alt="Tweedle Logo" className="logo-img" />
-        </NavLink>
-      </div>
+    <nav className="bg-black border-b border-gray-800 px-6 py-4 sticky top-0 z-50">
+      <div className="max-w-6xl mx-auto flex items-center justify-between">
+        <Link to="/home" className="flex items-center space-x-2">
+          <Twitter className="h-8 w-8 text-blue-400" />
+          <span className="text-xl font-bold text-white">Tweedle</span>
+        </Link>
 
-      
-     
-      {user && <SearchBar />}
-      {user && (
-        <div className="navbar-right">
-          <NavLink to="/" className={({ isActive }) => isActive ? "navbar-link active" : "navbar-link"}>
-            <Home size={20} />
-            <span>Home</span>     
-          </NavLink>
+        <div className="flex-1 max-w-md mx-8">
+          <SearchBar />
+        </div>
 
-          <NavLink to="/post" className={({ isActive }) => isActive ? "navbar-link active" : "navbar-link"}>
-            <Edit size={20} />
-            <span>Post</span>
-          </NavLink>
-
-          <NavLink to="/profile" className={({ isActive }) => isActive ? "navbar-link active" : "navbar-link"}>
-            <User size={20} />
-            <span>Profile</span>
-          </NavLink>
-
-          <button onClick={handleLogout} className="navbar-link navbar-logout">
-            <LogOut size={20} />
-            <span>Logout</span>
+        <div className="flex items-center space-x-4">
+          <Link
+            to="/home"
+            className="flex items-center space-x-2 px-4 py-2 rounded-full hover:bg-gray-900 transition-colors"
+          >
+            <Home className="h-5 w-5 text-gray-300" />
+            <span className="text-gray-300 hidden sm:block">Home</span>
+          </Link>
+          
+          <Link
+            to="/profile"
+            className="flex items-center space-x-2 px-4 py-2 rounded-full hover:bg-gray-900 transition-colors"
+          >
+            <User className="h-5 w-5 text-gray-300" />
+            <span className="text-gray-300 hidden sm:block">Profile</span>
+          </Link>
+          
+          <Link
+            to="/post"
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-full transition-colors"
+          >
+            <PenTool className="h-5 w-5 text-white" />
+            <span className="text-white hidden sm:block">Post</span>
+          </Link>
+          
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-2 px-4 py-2 rounded-full hover:bg-red-900 transition-colors"
+          >
+            <LogOut className="h-5 w-5 text-red-400" />
+            <span className="text-red-400 hidden sm:block">Logout</span>
           </button>
         </div>
-      )}
+      </div>
     </nav>
   );
 };

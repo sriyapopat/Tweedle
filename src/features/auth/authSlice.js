@@ -1,145 +1,90 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
+import { users } from '../../data/users.js'; // imported mock users array
 
-export const loginUser = createAsyncThunk(
-  'auth/loginUser',
-  async ({ email, password }, { rejectWithValue }) => {
-    try {
-      const response = await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          if (email === 'demo@tweedle.com' && password === 'demo123') {
-            resolve({
-              data: {
-                user: {
-                  id: '1',
-                  username: 'demo_user',
-                  email: 'demo@tweedle.com',
-                  avatar: null,
-                  bio: 'Demo user for Tweedle',
-                  joinedAt: '2024-01-01',
-                },
-                token: 'mock-jwt-token-demo',
-              },
-            });
-          } else if (email === 'demo1@tweedle.com' && password === 'demo1123') {
-            resolve({
-              data: {
-                user: {
-                  id: '2',
-                  username: 'demo1_user',
-                  email: 'demo1@tweedle.com',
-                  avatar: null,
-                  bio: 'Second demo user',
-                  joinedAt: '2020-09-08',
-                },
-                token: 'mock-jwt-token-demo1',
-              },
-            });
-          } else {
-            reject(new Error('Invalid credentials'));
-          }
-        }, 1000);
-      });
-
-      localStorage.setItem('token', response.data.token);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const registerUser = createAsyncThunk(
-  'auth/registerUser',
-  async ({ username, email, password }, { rejectWithValue }) => {
-    try {
-      const response = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            data: {
-              user: {
-                id: Date.now().toString(),
-                username,
-                email,
-                avatar: null,
-                bio: '',
-                joinedAt: new Date().toISOString(),
-              },
-              token: 'mock-jwt-token',
-            },
-          });
-        }, 1000);
-      });
-
-      localStorage.setItem('token', response.data.token);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
+const initialState = {
+  user: null,
+  isAuthenticated: false,
+  loading: false,
+  error: null,
+};
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState: {
-    user: null,
-    token: localStorage.getItem('token'),
-    isLoading: false,
-    error: null,
-  },
+  initialState,
   reducers: {
-  followUser: (state, action) => {
-    const userId = action.payload;
-    if (!state.user.following.includes(userId)) {
-      state.user.following.push(userId);
-    }
-  },
-  unfollowUser: (state, action) => {
-    const userId = action.payload;
-    state.user.following = state.user.following.filter(id => id !== userId);
-  },
-  // ... other reducers
-},
-  reducers: {
-    logout: (state) => {
-      localStorage.removeItem('token');
+    loginStart: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    loginSuccess: (state, action) => {
+      state.loading = false;
+      state.isAuthenticated = true;
+      state.user = action.payload;
+      state.error = null;
+      localStorage.setItem('tweedle_user', JSON.stringify(action.payload));
+    },
+    loginFailure: (state, action) => {
+      state.loading = false;
+      state.isAuthenticated = false;
       state.user = null;
-      state.token = null;
+      state.error = action.payload;
+    },
+    register: (state, action) => {
+      const { email } = action.payload;
+      const existingUser = users.find((u) => u.email === email);
+
+      if (existingUser) {
+        state.error = 'Email already exists';
+        state.isAuthenticated = false;
+        state.user = null;
+      } else {
+        const newUser = {
+          id: Date.now(),
+          ...action.payload,
+          followers: 0,
+          following: 0,
+          avatar: `https://api.dicebear.com/6.x/initials/svg?seed=${action.payload.username}`,
+          joinedDate: new Date().toISOString().split('T')[0],
+        };
+
+        users.push(newUser); // In-memory mock registration
+        state.user = newUser;
+        state.isAuthenticated = true;
+        state.error = null;
+        localStorage.setItem('tweedle_user', JSON.stringify(newUser));
+      }
+    },
+    checkAuthStatus: (state) => {
+      const storedUser = localStorage.getItem('tweedle_user');
+      if (storedUser) {
+        try {
+          state.user = JSON.parse(storedUser);
+          state.isAuthenticated = true;
+        } catch (error) {
+          localStorage.removeItem('tweedle_user');
+        }
+      }
+    },
+    logout: (state) => {
+      state.isAuthenticated = false;
+      state.user = null;
+      state.error = null;
+      localStorage.removeItem('tweedle_user');
     },
     clearError: (state) => {
       state.error = null;
     },
   },
-  extraReducers: (builder) => {
-    builder
-      .addCase(loginUser.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      })
-      .addCase(registerUser.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(registerUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      });
-  },
 });
 
-export const { logout, clearError, followUser, unfollowUser } = authSlice.actions;
-export default authSlice.reducer;
+export const {
+  loginStart,
+  loginSuccess,
+  loginFailure,
+  register,
+  checkAuthStatus,
+  logout,
+  clearError,
+} = authSlice.actions;
 
+export default authSlice.reducer;

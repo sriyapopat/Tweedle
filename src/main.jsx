@@ -1,21 +1,17 @@
-// src/main.jsx
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
-
-// CSS imports
-import './styles/globals.css';
-import './styles/navbar.css';
-import './styles/tweetCard.css';
-import './styles/profile.css';
-import './styles/homepage.css';
-import './styles/resposive.css';
-import './styles/loader.css';
-import './styles/likeButton.css';
-import './styles/seacrchBar.css';
+import { store } from './store.js';
+import './index.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <Provider store={store}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </Provider>
   </StrictMode>
 );

@@ -1,54 +1,64 @@
-import React from 'react';
-import { User, Calendar } from 'lucide-react';
+import { Calendar, Users, UserCheck } from 'lucide-react';
 
-const ProfileInfo = ({ user, isOwnProfile = false }) => {
-  const formatDate = (dateString) => {
+const ProfileInfo = ({ user, isOwnProfile = false, onFollow, onUnfollow, isFollowing = false }) => {
+  const formatJoinDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
-      month: 'long', 
-      year: 'numeric' 
+      year: 'numeric', 
+      month: 'long' 
     });
   };
 
   return (
-    <div className="profile-info">
-      <div className="profile-header">
-        <div className="profile-avatar">
-          {user.avatar ? (
-            <img src={user.avatar} alt={user.username} />
-          ) : (
-            <User size={48} />
-          )}
-        </div>
-        <div className="profile-details">
-          <h1 className="profile-username">@{user.username}</h1>
-          <div className="profile-meta">
-            <div className="profile-meta-item">
-              <Calendar size={16} />
-              <span>Joined {formatDate(user.joinedAt)}</span>
-            </div>
+    <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center space-x-4">
+          <img
+            src={user.avatar}
+            alt={user.username}
+            className="w-20 h-20 rounded-full border-2 border-gray-700"
+          />
+          <div>
+            <h2 className="text-2xl font-bold text-white">@{user.username}</h2>
+            <p className="text-gray-400">{user.email}</p>
           </div>
         </div>
+        
+        {!isOwnProfile && (
+          <button
+            onClick={isFollowing ? onUnfollow : onFollow}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-colors ${
+              isFollowing
+                ? 'bg-gray-700 hover:bg-red-700 text-white'
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
+            }`}
+          >
+            <UserCheck className="h-4 w-4" />
+            <span>{isFollowing ? 'Unfollow' : 'Follow'}</span>
+          </button>
+        )}
       </div>
       
       {user.bio && (
-        <div className="profile-bio">
-          <p>{user.bio}</p>
-        </div>
+        <p className="text-gray-300 mb-4 leading-relaxed">{user.bio}</p>
       )}
       
-      <div className="profile-stats">
-        <div className="profile-stat">
-          <span className="stat-number">{user.tweetsCount || 0}</span>
-          <span className="stat-label">Tweets</span>
+      <div className="flex items-center space-x-6 text-sm text-gray-400">
+        <div className="flex items-center space-x-1">
+          <Calendar className="h-4 w-4" />
+          <span>Joined {formatJoinDate(user.joinedDate)}</span>
         </div>
-        <div className="profile-stat">
-          <span className="stat-number">{user.followersCount || 0}</span>
-          <span className="stat-label">Followers</span>
-        </div>
-        <div className="profile-stat">
-          <span className="stat-number">{user.followingCount || 0}</span>
-          <span className="stat-label">Following</span>
+        
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-1">
+            <Users className="h-4 w-4" />
+            <span className="text-white font-medium">{user.following}</span>
+            <span>Following</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <span className="text-white font-medium">{user.followers}</span>
+            <span>Followers</span>
+          </div>
         </div>
       </div>
     </div>

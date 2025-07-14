@@ -1,120 +1,81 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { User, Heart } from 'lucide-react';
-import { fetchComments, addComment } from '../features/comment/commentSlice';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Send } from 'lucide-react';
 
-const CommentSection = ({ tweetId }) => {
+const CommentSection = ({ tweet, onAddComment }) => {
   const [newComment, setNewComment] = useState('');
-  const dispatch = useDispatch();
-  const { commentsByTweet, isLoading } = useSelector((state) => state.comments);
   const { user } = useSelector((state) => state.auth);
-  
-  const comments = commentsByTweet[tweetId] || [];
 
-  useEffect(() => {
-    dispatch(fetchComments({ tweetId }));
-  }, [dispatch, tweetId]);
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (newComment.trim()) {
-      const result = await dispatch(addComment({ 
-        tweetId, 
-        content: newComment.trim() 
-      }));
-      if (result.type === 'comments/addComment/fulfilled') {
-        setNewComment('');
-      }
+      onAddComment(newComment.trim());
+      setNewComment('');
     }
   };
 
-  const formatTime = (timestamp) => {
+  const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
-    const now = new Date();
-    const diffInMinutes = Math.floor((now - date) / (1000 * 60));
-    
-    if (diffInMinutes < 60) {
-      return `${diffInMinutes}m`;
-    } else if (diffInMinutes < 1440) {
-      return `${Math.floor(diffInMinutes / 60)}h`;
-    } else {
-      return `${Math.floor(diffInMinutes / 1440)}d`;
-    }
+    return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
   };
 
   return (
-    <div className="comment-section">
-      {user && (
-        <form onSubmit={handleSubmit} className="comment-form">
-          <div className="comment-form-header">
-            <div className="comment-avatar">
-              {user.avatar ? (
-                <img src={user.avatar} alt={user.username} />
-              ) : (
-                <User size={20} />
-              )}
-            </div>
+    <div className="mt-6">
+      <h3 className="text-lg font-bold text-white mb-4">
+        Comments ({tweet.comments?.length || 0})
+      </h3>
+      
+      <form onSubmit={handleSubmit} className="mb-6">
+        <div className="flex items-start space-x-3">
+          <img
+            src={user?.avatar}
+            alt={user?.username}
+            className="w-10 h-10 rounded-full"
+          />
+          <div className="flex-1">
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Write a comment..."
-              className="comment-textarea"
-              rows={3}
-              maxLength={280}
+              placeholder="Add a comment..."
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 resize-none focus:outline-none focus:border-blue-500"
+              rows="3"
             />
-          </div>
-          <div className="comment-form-footer">
-            <span className="comment-character-count">
-              {newComment.length}/280
-            </span>
-            <button
-              type="submit"
-              className="btn-primary comment-btn"
-              disabled={!newComment.trim() || isLoading}
-            >
-              Comment
-            </button>
-          </div>
-        </form>
-      )}
-      
-      <div className="comments-list">
-        {isLoading && comments.length === 0 ? (
-          <div className="comments-loading">Loading comments...</div>
-        ) : (
-          comments.map((comment) => (
-            <div key={comment.id} className="comment-item">
-              <div className="comment-header">
-                <div className="comment-user-info">
-                  <div className="comment-avatar">
-                    {comment.user.avatar ? (
-                      <img src={comment.user.avatar} alt={comment.user.username} />
-                    ) : (
-                      <User size={16} />
-                    )}
-                  </div>
-                  <span className="comment-username">@{comment.user.username}</span>
-                  <span className="comment-time">{formatTime(comment.timestamp)}</span>
-                </div>
-              </div>
-              <div className="comment-content">
-                <p>{comment.content}</p>
-              </div>
-              <div className="comment-actions">
-                <button className="comment-action-btn">
-                  <Heart size={14} fill={comment.isLiked ? 'currentColor' : 'none'} />
-                  <span>{comment.likes}</span>
-                </button>
-              </div>
+            <div className="flex justify-end mt-2">
+              <button
+                type="submit"
+                disabled={!newComment.trim()}
+                className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed px-4 py-2 rounded-full transition-colors"
+              >
+                <Send className="h-4 w-4 text-white" />
+                <span className="text-white">Comment</span>
+              </button>
             </div>
-          ))
-        )}
-        
-        {comments.length === 0 && !isLoading && (
-          <div className="no-comments">
-            <p>No comments yet. Be the first to comment!</p>
           </div>
-        )}
+        </div>
+      </form>
+      
+      <div className="space-y-4">
+        {tweet.comments?.map((comment) => (
+          <div key={comment.id} className="flex items-start space-x-3 p-4 bg-gray-800 rounded-lg">
+            <img
+              src={`https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&fit=crop`}
+              alt={comment.username}
+              className="w-8 h-8 rounded-full"
+            />
+            <div className="flex-1">
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="font-medium text-white">@{comment.username}</span>
+                <span className="text-gray-500 text-sm">
+                  {formatTimestamp(comment.timestamp)}
+                </span>
+              </div>
+              <p className="text-gray-300">{comment.content}</p>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
