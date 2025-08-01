@@ -1,31 +1,18 @@
-import React, { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchSingleTweet, addComment } from '../features/tweet/tweetSlice';
-import TweetCard from '../components/TweetCard';
-import CommentSection from '../components/CommentSection';
-import tweetSlice from '../features/tweet/tweetSlice';
+import Navbar from '../components/Navbar.jsx';
+import TweetForm from '../components/TweetForm.jsx';
 
 const PostPage = () => {
-  const { id } = useParams();
-  const dispatch = useDispatch();
-  const { singleTweet, loading } = useSelector((state) => state.tweets);
-
-  useEffect(() => {
-    dispatch(fetchSingleTweet(id));
-  }, [dispatch, id]);
-
-  const handleAddComment = (text) => {
-    dispatch(addComment({ tweetId: id, text }));
-  };
-
-  if (loading || !singleTweet) return <p>Loading...</p>;
-
   return (
-    <div>
-      <h2>Tweet Details</h2>
-      <TweetCard tweet={singleTweet} />
-      <CommentSection comments={singleTweet.comments} onAddComment={handleAddComment} />
+    <div className="min-h-screen bg-black">
+      <Navbar />
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-white mb-2">Create a Tweet</h1>
+          <p className="text-gray-400">Share your thoughts with the world</p>
+        </div>
+        
+        <TweetForm />
+      </div>
     </div>
   );
 };

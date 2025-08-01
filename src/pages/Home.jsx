@@ -1,25 +1,32 @@
-import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { fetchTweets } from "../features/tweet/tweetSlice";
-import TweetCard from "../components/TweetCard";
+import { useSelector } from 'react-redux';
+import TweetCard from '../components/TweetCard.jsx';
+import Navbar from '../components/Navbar.jsx';
 
 const Home = () => {
-  const dispatch = useDispatch();
-  const { tweets, loading, error } = useSelector((state) => state.tweets);
-
-  useEffect(() => {
-    dispatch(fetchTweets());
-  }, [dispatch]);
-
-  if (loading) return <p>Loading tweets...</p>;
-  if (error) return <p>Error: {error}</p>;
+  const { tweets } = useSelector((state) => state.tweets);
 
   return (
-    <div>
-      <h2>Home Feed</h2>
-      {Array.isArray(tweets) && tweets.map((tweet) => (
-        <TweetCard key={tweet._id} tweet={tweet} />
-      ))}
+    <div className="min-h-screen bg-black">
+      <Navbar />
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-white mb-2">Home</h1>
+          <p className="text-gray-400">See what's happening in your world</p>
+        </div>
+        
+        <div className="space-y-4">
+          {tweets.length > 0 ? (
+            tweets.map((tweet) => (
+              <TweetCard key={tweet.id} tweet={tweet} />
+            ))
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-400 text-lg">No tweets yet</p>
+              <p className="text-gray-500">Be the first to share something!</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

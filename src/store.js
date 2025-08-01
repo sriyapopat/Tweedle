@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './features/auth/authSlice';
-import tweetReducer from './features/tweet/tweetSlice';
-import commentReducer from './features/comment/commentSlice';
-import userReducer from './features/user/userSlice';
+import authReducer from './features/auth/authSlice.js';
+import tweetReducer from './features/tweet/tweetSlice.js';
+import commentReducer from './features/comment/commentSlice.js';
+import userReducer from './features/user/userSlice.js';
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
     auth: authReducer,
     tweets: tweetReducer,
@@ -12,5 +12,3 @@ const store = configureStore({
     users: userReducer,
   },
 });
-
-export default store;

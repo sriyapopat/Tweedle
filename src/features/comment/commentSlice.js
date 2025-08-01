@@ -1,27 +1,22 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice } from '@reduxjs/toolkit';
 
-export const fetchComments = createAsyncThunk('comments/fetch', async (tweetId) => {
-  const res = await axios.get(`/api/tweets/${tweetId}/comments`);
-  return res.data;
-});
+const initialState = {
+  loading: false,
+  error: null,
+};
 
 const commentSlice = createSlice({
   name: 'comments',
-  initialState: {
-    list: [],
-    loading: false,
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchComments.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(fetchComments.fulfilled, (state, action) => {
-        state.loading = false;
-        state.list = action.payload;
-      });
+  initialState,
+  reducers: {
+    addComment: (state, action) => {
+      // Comments are handled in tweet slice for simplicity
+    },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
   },
 });
 
+export const { addComment, setLoading } = commentSlice.actions;
 export default commentSlice.reducer;
